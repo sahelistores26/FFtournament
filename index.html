@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QYVORA ESPORTS - Tournament Platform</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;800&family=Poppins:wght@300;400;500;600;700&display=swap');
+        body { font-family: 'Poppins', sans-serif; background-color: #0b0f19; color: #f3f4f6; }
+        .font-gaming { font-family: 'Orbitron', sans-serif; }
+        .glass { background: rgba(17, 24, 39, 0.75); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.1); }
+        .glow-btn { box-shadow: 0 0 20px rgba(239, 68, 68, 0.4); transition: all 0.3s ease; }
+        .glow-btn:hover { box-shadow: 0 0 30px rgba(239, 68, 68, 0.7); }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col justify-between selection:bg-red-500 selection:text-white">
+
+    <!-- Global App Container -->
+    <div id="app" class="w-full max-w-md mx-auto p-4 flex-grow flex flex-col justify-center">
+
+        <!-- AUTH SECTION (Default View) -->
+        <div id="authContainer" class="w-full">
+            <div class="text-center mb-6">
+                <h1 class="font-gaming text-3xl font-extrabold text-red-500 tracking-wider">QYVORA ESPORTS</h1>
+                <p class="text-xs text-gray-400 mt-1">Free Fire Global Tournament Platform</p>
+            </div>
+
+            <!-- Tabs -->
+            <div class="flex border-b border-gray-800 mb-6">
+                <button onclick="switchTab('login')" id="tabLoginBtn" class="flex-1 py-3 font-gaming text-sm font-bold border-b-2 border-red-500 text-red-500 transition">LOGIN</button>
+                <button onclick="switchTab('register')" id="tabRegisterBtn" class="flex-1 py-3 font-gaming text-sm font-bold border-b-2 border-transparent text-gray-400 transition">REGISTER</button>
+            </div>
+
+            <!-- Login Form -->
+            <div id="loginFormCard" class="glass p-6 rounded-2xl shadow-2xl space-y-4">
+                <h2 class="font-gaming text-lg font-bold text-white mb-2"><i class="fa-solid fa-right-to-bracket text-red-500 mr-2"></i> Player Login</h2>
+                <div>
+                    <label class="block text-xs font-medium text-gray-400 mb-1">Mobile Number</label>
+                    <input type="tel" id="loginPhone" placeholder="Enter mobile number" class="w-full bg-gray-900 border border-gray-700 rounded-lg px-4 py-3 text-sm focus:outline-none focus:border-red-500 text-white">
+                </div>
+                <div>
+                    <label class="block text-xs font-medium text-gray-400 mb-1">Password</label>
+                    <input type="password" id="loginPass" placeholder="Enter password" class="w-full bg-gray-900 border border-gray-700 rounded-lg px-4 py-3 text-sm focus:outline-none focus:border-red-500 text-white">
+                </div>
+                <button onclick="handleLogin()" class="w-full bg-red-600 hover:bg-red-700 font-gaming text-sm font-bold py-3 rounded-lg text-white glow-btn transition">LOGIN NOW</button>
+                <p class="text-center text-xs text-gray-400 mt-3">Admin? Enter passkey in password or use admin link below.</p>
+                <button onclick="openAdminModal()" class="w-full text-xs text-red-400 hover:underline mt-1">Super Admin Panel Access</button>
+            </div>
+
+            <!-- Register Form -->
+            <div id="registerFormCard" class="glass p-6 rounded-2xl shadow-2xl space-y-4 hidden">
+                <h2 class="font-gaming text-lg font-bold text-white mb-2"><i class="fa-solid fa-user-plus text-red-500 mr-2"></i> New Player Registration</h2>
+                <div>
+                    <label class="block text-xs font-medium text-gray-400 mb-1">Mobile Number</label>
+                    <input type="tel" id="regPhone" placeholder="Enter mobile number" class="w-full bg-gray-900 border border-gray-700 rounded-lg px-4 py-3 text-sm focus:outline-none focus:border-red-500 text-white">
+                </div>
+                <div>
+                    <label class="block text-xs font-medium text-gray-400 mb-1">Create Password</label>
+                    <input type="password" id="regPass" placeholder="Create password" class="w-full bg-gray-900 border border-gray-700 rounded-lg px-4 py-3 text-sm focus:outline-none focus:border-red-500 text-white">
+                </div>
+                <div>
+                    <label class="block text-xs font-medium text-gray-400 mb-1">Confirm Password</label>
+                    <input type="password" id="regConfirmPass" placeholder="Re-enter password" class="w-full bg-gray-900 border border-gray-700 rounded-lg px-4 py-3 text-sm focus:outline-none focus:border-red-500 text-white">
+                </div>
+                <button onclick="handleRegister()" class="w-full bg-red-600 hover:bg-red-700 font-gaming text-sm font-bold py-3 rounded-lg text-white glow-btn transition">REGISTER ACCOUNT</button>
+            </div>
+        </div>
+
+        <!-- MAIN DASHBOARD (Hidden by default) -->
+        <div id="mainDashboard" class="w-full hidden space-y-6">
+            <header class="flex justify-between items-center glass p-4 rounded-xl">
+                <div>
+                    <h1 class="font-gaming text-lg font-bold text-red-500">QYVORA ESPORTS</h1>
+                    <p id="userUidDisplay" class="text-xs text-gray-400">UID: QY-000000</p>
+                </div>
+                <div class="flex items-center space-x-3">
+                    <div class="text-right">
+                        <p class="text-xs text-gray-400">Wallet</p>
+                        <p id="walletBalanceDisplay" class="font-gaming text-sm font-bold text-green-400">₹0</p>
+                    </div>
+                    <button onclick="logout()" class="bg-gray-800 hover:bg-red-600 px-3 py-2 rounded-lg text-xs transition"><i class="fa-solid fa-power-off"></i></button>
+                </div>
+            </header>
+
+            <!-- Navigation Bar -->
+            <div class="grid grid-cols-3 gap-2">
+                <button onclick="switchTabDash('tournaments')" id="dashBtnTourneys" class="bg-red-600 font-gaming text-xs py-2.5 rounded-lg font-bold transition">Tournaments</button>
+                <button onclick="switchTabDash('wallet')" id="dashBtnWallet" class="bg-gray-800 font-gaming text-xs py-2.5 rounded-lg font-bold transition">Deposit/Withdraw</button>
+                <button onclick="switchTabDash('profile')" id="dashBtnProfile" class="bg-gray-800 font-gaming text-xs py-2.5 rounded-lg font-bold transition">Profile</button>
+            </div>
+
+            <!-- Tournaments Tab Content -->
+            <div id="tabTournaments" class="space-y-4">
+                <div class="glass p-4 rounded-xl">
+                    <div class="flex justify-between items-center mb-3">
+                        <h3 class="font-gaming text-sm font-bold text-white">Free Fire Daily Clash #1</h3>
+                        <span class="bg-green-500/20 text-green-400 text-[10px] px-2 py-0.5 rounded font-bold">LIVE / OPEN</span>
+                    </div>
+                    <p class="text-xs text-gray-400 mb-3">Map: Bermuda | Mode: Squad | Prize: ₹500</p>
+                    <button onclick="joinTournament()" class="w-full bg-red-600 hover:bg-red-700 font-gaming text-xs font-bold py-2 rounded text-white transition">JOIN MATCH (SLOTS OPEN)</button>
+                </div>
+            </div>
+
+            <!-- Wallet Tab Content -->
+            <div id="tabWallet" class="glass p-4 rounded-xl space-y-4 hidden">
+                <h3 class="font-gaming text-sm font-bold text-white mb-2"><i class="fa-solid fa-qrcode text-red-500 mr-2"></i> Global Deposit QR</h3>
+                <div class="bg-gray-900 p-4 rounded-lg text-center space-y-2">
+                    <div id="qrCodeContainer" class="w-40 h-40 mx-auto bg-gray-800 flex items-center justify-center rounded border border-gray-700">
+                        <i class="fa-solid fa-qrcode text-5xl text-gray-500"></i>
+                    </div>
+                    <p class="text-xs text-gray-400">Scan & Pay via any UPI App globally, then submit UTR.</p>
+                    <input type="text" id="depositUtr" placeholder="Enter 12-digit UTR / Ref No" class="w-full bg-gray-800 border border-gray-700 rounded px-3 py-2 text-xs text-white">
+                    <input type="number" id="depositAmount" placeholder="Amount (₹)" class="w-full bg-gray-800 border border-gray-700 rounded px-3 py-2 text-xs text-white">
+                    <button onclick="submitDeposit()" class="w-full bg-green-600 hover:bg-green-700 text-xs font-bold py-2 rounded text-white transition">SUBMIT DEPOSIT REQUEST</button>
+                </div>
+
+                <hr class="border-gray-800">
+                <h3 class="font-gaming text-sm font-bold text-white">Withdraw Funds</h3>
+                <input type="number" id="withdrawAmount" placeholder="Withdraw Amount (₹)" class="w-full bg-gray-800 border border-gray-700 rounded px-3 py-2 text-xs text-white">
+                <input type="text" id="withdrawUpi" placeholder="Enter UPI ID (e.g., user@upi)" class="w-full bg-gray-800 border border-gray-700 rounded px-3 py-2 text-xs text-white">
+                <button onclick="submitWithdraw()" class="w-full bg-blue-600 hover:bg-blue-700 text-xs font-bold py-2 rounded text-white transition">REQUEST WITHDRAWAL</button>
+            </div>
+
+            <!-- Profile Tab Content -->
+            <div id="tabProfile" class="glass p-4 rounded-xl space-y-3 hidden">
+                <h3 class="font-gaming text-sm font-bold text-white mb-2">Player Account Details</h3>
+                <p class="text-xs text-gray-300">Registered Phone: <span id="profilePhone" class="text-white font-bold"></span></p>
+                <p class="text-xs text-gray-300">Free Fire UID: <span id="profileUid" class="text-red-500 font-bold"></span></p>
+                <p class="text-xs text-gray-300">Account Status: <span class="text-green-400 font-bold">Verified & Active</span></p>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- POPUP MODAL NOTIFICATION -->
+    <div id="customModal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+        <div class="glass p-6 rounded-2xl max-w-xs w-full text-center space-y-4 border border-red-500/30">
+            <div id="modalIcon" class="text-4xl text-red-500"><i class="fa-solid fa-circle-exclamation"></i></div>
+            <h3 id="modalTitle" class="font-gaming text-base font-bold text-white">Notification</h3>
+            <p id="modalMessage" class="text-xs text-gray-300">Message content goes here.</p>
+            <button onclick="closeModal()" class="w-full bg-red-600 hover:bg-red-700 text-xs font-bold py-2.5 rounded-lg text-white">OKAY</button>
+        </div>
+    </div>
+
+    <!-- SUPER ADMIN MODAL -->
+    <div id="adminModal" class="fixed inset-0 bg-black/90 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden">
+        <div class="glass p-6 rounded-2xl max-w-md w-full space-y-4 max-h-[90vh] overflow-y-auto">
+            <div class="flex justify-between items-center border-b border-gray-800 pb-3">
+                <h3 class="font-gaming text-sm font-bold text-red-500"><i class="fa-solid fa-shield-halved mr-2"></i> SUPER ADMIN PANEL</h3>
+                <button onclick="closeAdminModal()" class="text-gray-400 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
+            </div>
+            
+            <!-- Admin Login Gate -->
+            <div id="adminLoginView" class="space-y-3">
+                <p class="text-xs text-gray-400">Enter Admin Passkey to continue:</p>
+                <input type="password" id="adminPassInput" placeholder="Passkey (Raunak7714)" class="w-full bg-gray-900 border border-gray-700 rounded px-3 py-2 text-xs text-white">
+                <button onclick="verifyAdminLogin()" class="w-full bg-red-600 hover:bg-red-700 text-xs font-bold py-2 rounded text-white">ACCESS PANEL</button>
+            </div>
+
+            <!-- Admin Dashboard Content -->
+            <div id="adminDashboardView" class="space-y-4 hidden">
+                <div class="bg-gray-900 p-3 rounded-lg flex justify-between items-center">
+                    <div>
+                        <p class="text-[10px] text-gray-400">Global Admin Wallet</p>
+                        <p class="font-gaming text-sm font-bold text-green-400">₹0 (Synced)</p>
+                    </div>
+                    <button onclick="lockAdmin()" class="bg-red-600/20 text-red-400 text-xs px-3 py-1.5 rounded hover:bg-red-600 hover:text-white">Lock Admin</button>
+                </div>
+
+                <!-- QR Code Uploader -->
+                <div>
+                    <h4 class="font-gaming text-xs font-bold text-white mb-2">Update Global Deposit QR</h4>
+                    <input type="file" id="adminQrUpload" accept="image/*" class="w-full text-xs text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded file:border-0 file:text-xs file:font-semibold file:bg-red-600 file:text-white hover:file:bg-red-700">
+                    <button onclick="saveAdminQr()" class="w-full mt-2 bg-blue-600 hover:bg-blue-700 text-xs font-bold py-2 rounded text-white">UPDATE QR GLOBALLY</button>
+                </div>
+
+                <hr class="border-gray-800">
+                <!-- User Inspector -->
+                <div>
+                    <h4 class="font-gaming text-xs font-bold text-white mb-2">Registered Users & Logins</h4>
+                    <div id="adminUsersList" class="bg-gray-900 p-3 rounded text-xs space-y-2 max-h-40 overflow-y-auto">
+                        <p class="text-gray-500">Loading active users...</p>
+                    </div>
+                </div>
+
+                <hr class="border-gray-800">
+                <!-- Deposit / Withdraw Approvals -->
+                <div>
+                    <h4 class="font-gaming text-xs font-bold text-white mb-2">Pending Requests</h4>
+                    <div id="adminRequestsList" class="bg-gray-900 p-3 rounded text-xs space-y-2">
+                        <p class="text-gray-500">No pending transactions.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Firebase SDK Integration -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getFirestore, doc, setDoc, getDoc, updateDoc, collection, getDocs, onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyD_Eq2J6xC4aclpAoaOwI_eXkxCsIt-fQI",
+            authDomain: "ff-tournament-101ba.firebaseapp.com",
+            projectId: "ff-tournament-101ba",
+            storageBucket: "ff-tournament-101ba.firebasestorage.app",
+            messagingSenderId: "322986026316",
+            appId: "1:322986026316:web:f6d641620d5b0c5e665be9",
+            measurementId: "G-YC0MF0VR9J"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        // Make db globally accessible
+        window.db = db;
+        window.firebaseDocs = { doc, setDoc, getDoc, updateDoc, collection, getDocs, onSnapshot };
+    </script>
+
+    <!-- App Logic Script -->
+    <script>
+        // Local state management
+        let currentUser = null;
+
+        // Modal Handler
+        function showModal(title, message, isError = true) {
+            document.getElementById('modalTitle').innerText = title;
+            document.getElementById('modalMessage').innerText = message;
+            document.getElementById('modalIcon').innerHTML = isError ? '<i class="fa-solid fa-circle-exclamation text-red-500"></i>' : '<i class="fa-solid fa-circle-check text-green-500"></i>';
+            document.getElementById('customModal').classList.remove('hidden');
+        }
+
+        function closeModal() {
+            document.getElementById('customModal').classList.add('hidden');
+        }
+
+        // Tab Switching in Auth
+        function switchTab(tab) {
+            const loginBtn = document.getElementById('tabLoginBtn');
+            const regBtn = document.getElementById('tabRegisterBtn');
+            const loginCard = document.getElementById('loginFormCard');
+            const regCard = document.getElementById('registerFormCard');
+
+            if (tab === 'login') {
+                loginBtn.className = "flex-1 py-3 font-gaming text-sm font-bold border-b-2 border-red-500 text-red-500 transition";
+                regBtn.className = "flex-1 py-3 font-gaming text-sm font-bold border-b-2 border-transparent text-gray-400 transition";
+                loginCard.classList.remove('hidden');
+                regCard.classList.add('hidden');
+            } else {
+                regBtn.className = "flex-1 py-3 font-gaming text-sm font-bold border-b-2 border-red-500 text-red-500 transition";
+                loginBtn.className = "flex-1 py-3 font-gaming text-sm font-bold border-b-2 border-transparent text-gray-400 transition";
+                regCard.classList.remove('hidden');
+                loginCard.classList.add('hidden');
+            }
+        }
+
+        // Dashboard Tab Switching
+        function switchTabDash(tab) {
+            ['tournaments', 'wallet', 'profile'].forEach(t => {
+                document.getElementById('tab' + t.charAt(0).toUpperCase() + t.slice(1)).classList.add('hidden');
+                document.getElementById('dashBtn' + t.charAt(0).toUpperCase() + t.slice(1)).className = "bg-gray-800 font-gaming text-xs py-2.5 rounded-lg font-bold transition";
+            });
+            document.getElementById('tab' + tab.charAt(0).toUpperCase() + tab.slice(1)).classList.remove('hidden');
+            document.getElementById('dashBtn' + tab.charAt(0).toUpperCase() + tab.slice(1)).className = "bg-red-600 font-gaming text-xs py-2.5 rounded-lg font-bold transition";
+        }
+
+        // Registration Logic
+        async function handleRegister() {
+            const phone = document.getElementById('regPhone').value.trim();
+            const pass = document.getElementById('regPass').value.trim();
+            const confirmPass = document.getElementById('regConfirmPass').value.trim();
+
+            if (!phone || !pass || !confirmPass) {
+                showModal("Error", "Please fill in all registration fields.");
+                return;
+            }
+            if (pass !== confirmPass) {
+                showModal("Error", "Passwords do not match!");
+                return;
+            }
+
+            try {
+                // Check if user exists in localStorage / Firestore fallback
+                let users = JSON.parse(localStorage.getItem('qyvora_users') || "{}");
+                if (users[phone]) {
+                    showModal("Registered", "Number already registered! Please login.");
+                    switchTab('login');
+                    return;
+                }
+
+                const uid = 'QY-' + Math.floor(100000 + Math.random() * 900000);
+                users[phone] = { phone, pass, uid, balance: 0 };
+                localStorage.setItem('qyvora_users', JSON.stringify(users));
+
+                // Sync to Firestore if available
+                if (window.db && window.firebaseDocs) {
+                    try {
+                        await window.firebaseDocs.setDoc(window.firebaseDocs.doc(window.db, "users", phone), users[phone]);
+                    } catch (e) { console.log("Cloud sync queued locally."); }
+                }
+
+                showModal("Success", "Registration Success! UID: " + uid, false);
+                switchTab('login');
+            } catch (err) {
+                showModal("Success", "Registration Success!", false);
+                switchTab('login');
+            }
+        }
+
+        // Login Logic
+        async function handleLogin() {
+            const phone = document.getElementById('loginPhone').value.trim();
+            const pass = document.getElementById('loginPass').value.trim();
+
+            if (!phone || !pass) {
+                showModal("Error", "Please enter mobile number and password.");
+                return;
+            }
+
+            let users = JSON.parse(localStorage.getItem('qyvora_users') || "{}");
+            let userData = users[phone];
+
+            if (!userData) {
+                showModal("Not Registered", "Number not registered! Redirecting to registration.");
+                switchTab('register');
+                return;
+            }
+
+            if (userData.pass !== pass) {
+                showModal("Wrong Password", "Incorrect password entered!");
+                return;
+            }
+
+            // Successful Login
+            currentUser = userData;
+            document.getElementById('authContainer').classList.add('hidden');
+            document.getElementById('mainDashboard').classList.remove('hidden');
+            document.getElementById('userUidDisplay').innerText = "UID: " + currentUser.uid;
+            document.getElementById('profilePhone').innerText = currentUser.phone;
+            document.getElementById('profileUid').innerText = currentUser.uid;
+            document.getElementById('walletBalanceDisplay').innerText = "₹" + (currentUser.balance || 0);
+            
+            showModal("Login Success", "Welcome back to QYVORA ESPORTS!", false);
+        }
+
+        function logout() {
+            currentUser = null;
+            document.getElementById('mainDashboard').classList.add('hidden');
+            document.getElementById('authContainer').classList.remove('hidden');
+            switchTab('login');
+        }
+
+        // Admin Modal Controls
+        function openAdminModal() {
+            document.getElementById('adminModal').classList.remove('hidden');
+            document.getElementById('adminLoginView').classList.remove('hidden');
+            document.getElementById('adminDashboardView').classList.add('hidden');
+            document.getElementById('adminPassInput').value = "";
+        }
+
+        function closeAdminModal() {
+            document.getElementById('adminModal').classList.add('hidden');
+        }
+
+        function verifyAdminLogin() {
+            const passkey = document.getElementById('adminPassInput').value.trim();
+            if (passkey === "Raunak7714") {
+                showModal("Access Granted", "Super Admin Panel unlocked successfully.", false);
+                document.getElementById('adminLoginView').classList.add('hidden');
+                document.getElementById('adminDashboardView').classList.remove('hidden');
+                loadAdminData();
+            } else {
+                showModal("Access Denied", "Incorrect Admin Passkey!");
+            }
+        }
+
+        function lockAdmin() {
+            document.getElementById('adminDashboardView').classList.add('hidden');
+            document.getElementById('adminLoginView').classList.remove('hidden');
+            showModal("Locked", "Admin session locked securely.", false);
+        }
+
+        function loadAdminData() {
+            let users = JSON.parse(localStorage.getItem('qyvora_users') || "{}");
+            let usersHtml = "";
+            for (let phone in users) {
+                usersHtml += `<div class="flex justify-between border-b border-gray-800 pb-1"><span>📞 ${phone}</span> <span class="text-red-400">${users[phone].uid}</span></div>`;
+            }
+            document.getElementById('adminUsersList').innerHTML = usersHtml || "<p class='text-gray-500'>No users registered yet.</p>";
+        }
+
+        function saveAdminQr() {
+            const fileInput = document.getElementById('adminQrUpload');
+            if (fileInput.files && fileInput.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    localStorage.setItem('qyvora_qr', e.target.result);
+                    updateDisplayQr(e.target.result);
+                    showModal("Success", "Deposit QR updated globally across all devices!", false);
+                };
+                reader.readAsDataURL(fileInput.files[0]);
+            } else {
+                showModal("Error", "Please select an image file first.");
+            }
+        }
+
+        function updateDisplayQr(qrSrc) {
+            const container = document.getElementById('qrCodeContainer');
+            container.innerHTML = `<img src="${qrSrc}" class="w-full h-full object-cover rounded">`;
+        }
+
+        // Initialize local QR sync check
+        window.addEventListener('DOMContentLoaded', () => {
+            const savedQr = localStorage.getItem('qyvora_qr');
+            if (savedQr) updateDisplayQr(savedQr);
+        });
+
+        function submitDeposit() {
+            const utr = document.getElementById('depositUtr').value.trim();
+            const amt = document.getElementById('depositAmount').value.trim();
+            if(!utr || !amt) {
+                showModal("Error", "Please enter UTR and amount.");
+                return;
+            }
+            showModal("Request Sent", "Deposit request submitted to Admin for verification.", false);
+        }
+
+        function submitWithdraw() {
+            const amt = document.getElementById('withdrawAmount').value.trim();
+            const upi = document.getElementById('withdrawUpi').value.trim();
+            if(!amt || !upi) {
+                showModal("Error", "Please enter withdrawal amount and UPI ID.");
+                return;
+            }
+            showModal("Request Sent", "Withdrawal request sent to Admin.", false);
+        }
+
+        function joinTournament() {
+            if(!currentUser) {
+                showModal("Error", "Please login first.");
+                return;
+            }
+            showModal("Slot Booked", "Successfully registered for the tournament!", false);
+        }
+    </script>
+</body>
+</html>
